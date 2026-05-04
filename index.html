@@ -1318,10 +1318,10 @@
             <div class="select-wrapper" id="wrapper-2">
               <select class="form-select" id="select-2">
                 <option value="">Select your income range...</option>
-                <option value="under_20k">Under £20,000</option>
+                <option value="under20k">Under £20,000</option>
                 <option value="20k_30k">£20,000 – £30,000</option>
                 <option value="30k_50k">£30,000 – £50,000</option>
-                <option value="over_50k">Over £50,000</option>
+                <option value="over50k">Over £50,000</option>
               </select>
               <svg class="select-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M4 6l4 4 4-4" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1342,9 +1342,9 @@
             <div class="select-wrapper" id="wrapper-3">
               <select class="form-select" id="select-3">
                 <option value="">Select your current setup...</option>
-                <option value="named_software">Yes — I use named software (QuickBooks, Xero, FreeAgent, etc.)</option>
-                <option value="spreadsheets">Yes — I use spreadsheets only</option>
-                <option value="none">No — I use paper or nothing</option>
+                <option value="named_software">Yes — named software (QuickBooks, Xero, FreeAgent)</option>
+                <option value="spreadsheets">Yes — spreadsheets only</option>
+                <option value="nothing">No — paper or nothing</option>
               </select>
               <svg class="select-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M4 6l4 4 4-4" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1556,24 +1556,42 @@
        DECISION TREE — maps form answers to a cache key
     ═══════════════════════════════════════════════════════════ */
     function getProfile(incomeType, incomeRange, software, selfAssessment) {
-      var key = '';
+      let key = "";
 
-      if (incomeType === 'sole_trader') {
-        if (incomeRange === 'over_50k' || incomeRange === '30k_50k') key = 'sole_trader_over50k';
-        else if (incomeRange === '20k_30k') key = 'sole_trader_20k_30k';
-        else key = 'sole_trader_under20k';
-      } else if (incomeType === 'landlord') {
-        if (incomeRange === 'over_50k' || incomeRange === '30k_50k') key = 'landlord_over50k';
-        else if (incomeRange === '20k_30k') key = 'landlord_20k_30k';
-        else key = 'landlord_under20k';
-      } else if (incomeType === 'both') {
-        if (incomeRange === 'over_50k' || incomeRange === '30k_50k') key = 'both_over50k';
-        else key = 'both_under50k';
-      } else if (incomeType === 'employed_side') {
-        if (incomeRange === 'over_50k') key = 'employed_side_over50k';
-        else key = 'employed_side_under50k';
+      if (incomeType === "sole_trader") {
+        if (incomeRange === "over50k" || incomeRange === "30k_50k") {
+          key = "sole_trader_over50k";
+        } else if (incomeRange === "20k_30k") {
+          key = "sole_trader_20k_30k";
+        } else if (incomeRange === "under20k") {
+          key = "sole_trader_under20k";
+        }
+      } 
+      else if (incomeType === "landlord") {
+        if (incomeRange === "over50k" || incomeRange === "30k_50k") {
+          key = "landlord_over50k";
+        } else if (incomeRange === "20k_30k") {
+          key = "landlord_20k_30k";
+        } else if (incomeRange === "under20k") {
+          key = "landlord_under20k";
+        }
+      } 
+      else if (incomeType === "both") {
+        if (incomeRange === "over50k" || incomeRange === "30k_50k") {
+          key = "both_over50k";
+        } else {
+          key = "both_under50k";
+        }
+      } 
+      else if (incomeType === "employed_side") {
+        if (incomeRange === "over50k") {
+          key = "employed_side_over50k";
+        } else {
+          key = "employed_side_under50k";
+        }
       }
 
+      console.log("Profile key:", key); // for debugging
       return PROFILE_CACHE[key] || null;
     }
 
@@ -1689,25 +1707,39 @@
       }
 
       /* ── Result handler ─────────────────────────── */
+      let answer1 = ""; // income type
+      let answer2 = ""; // income range  
+      let answer3 = ""; // software
+      let answer4 = ""; // self assessment
+
       function handleResult() {
-        _incomeType  = $('select-1').value;
-        _incomeRange = $('select-2').value;
-        _software    = $('select-3').value;
-        _hmrcStatus  = $('select-4').value;
+        answer1 = document.getElementById('select-1').value; 
+        answer2 = document.getElementById('select-2').value;
+        answer3 = document.getElementById('select-3').value;
+        answer4 = document.getElementById('select-4').value;
 
-        currentProfile = getProfile(_incomeType, _incomeRange, _software, _hmrcStatus);
+        // Keep legacy variables updated for letter generator
+        _incomeType = answer1;
+        _incomeRange = answer2;
+        _software = answer3;
+        _hmrcStatus = answer4;
 
-        console.log('TaxPlain profile:', currentProfile);
+        let profile = getProfile(answer1, answer2, answer3, answer4);
+
+        console.log("answer1:", answer1);
+        console.log("answer2:", answer2);
+        console.log("profile found:", profile);
 
         // Hide form card, show result section
         $('main-card').parentElement.style.display = 'none';
         $('result-section').style.display = 'flex';
 
-        if (currentProfile) {
+        if (profile) {
+          currentProfile = profile;
           renderResult(currentProfile);
         } else {
           if (typeof window.__taxplainEdgeCase === 'function') {
-            window.__taxplainEdgeCase(_incomeType, _incomeRange, _software, _hmrcStatus);
+            window.__taxplainEdgeCase(answer1, answer2, answer3, answer4);
           } else {
             $('result-content').innerHTML = '<div class="edge-fallback-box"><p style="color:var(--primary);font-size:1.1rem;">&#x26A0;&#xFE0F; Your situation is complex</p><p style="color:var(--text);margin-top:12px;">Your income profile involves edge cases that require professional advice.</p><p style="color:var(--text-muted);margin-top:12px;">Visit <a href="https://www.gov.uk/guidance/check-if-youre-eligible-for-making-tax-digital-for-income-tax" target="_blank">HMRC\'s official MTD guidance</a>.</p><button id="btn-restart-edge" style="margin-top:20px;background:transparent;border:1px solid rgba(148,163,184,0.3);color:var(--text-muted);padding:12px 24px;border-radius:8px;cursor:pointer;font-family:inherit;">&larr; Start Over</button></div>';
             document.getElementById('btn-restart-edge').addEventListener('click', restartForm);
