@@ -1,0 +1,2275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="TaxPlain — Making Tax Digital explained simply for UK sole traders and landlords. Powered by Phi-4 Mini, runs locally, free forever." />
+  <title>TaxPlain ⚡ Making Tax Digital — Explained</title>
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#f97316" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="TaxPlain" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── RESET & BASE ─────────────────────────────── */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #0a0a0f;
+      --primary: #f97316;
+      --secondary: #1a1a2e;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --primary-10: rgba(249, 115, 22, 0.10);
+      --primary-30: rgba(249, 115, 22, 0.30);
+      --primary-08: rgba(249, 115, 22, 0.08);
+      --glow: 0 0 60px rgba(249, 115, 22, 0.08), 0 0 120px rgba(249, 115, 22, 0.04);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      line-height: 1.6;
+    }
+
+    /* ─── ANIMATED GLOBE BACKGROUND ────────────────── */
+    .globe-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px;
+      height: 700px;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .globe-svg {
+      width: 100%;
+      height: 100%;
+      animation: globeRotate 60s linear infinite;
+    }
+
+    @keyframes globeRotate {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Secondary rotation layer for depth */
+    .globe-inner {
+      animation: globeRotateReverse 90s linear infinite;
+      transform-origin: center;
+    }
+
+    @keyframes globeRotateReverse {
+      0%   { transform: rotate(0deg) scaleX(1); }
+      25%  { transform: rotate(90deg) scaleX(0.85); }
+      50%  { transform: rotate(180deg) scaleX(1); }
+      75%  { transform: rotate(270deg) scaleX(0.85); }
+      100% { transform: rotate(360deg) scaleX(1); }
+    }
+
+    /* ─── RADIAL GRADIENT OVERLAY ──────────────────── */
+    .radial-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(
+        ellipse at center,
+        rgba(10, 10, 15, 0.85) 0%,
+        rgba(10, 10, 15, 0.60) 40%,
+        rgba(10, 10, 15, 0.40) 70%,
+        rgba(10, 10, 15, 0.20) 100%
+      );
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ─── FLOATING PARTICLES ───────────────────────── */
+    .particles {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--primary);
+      border-radius: 50%;
+      opacity: 0.35;
+      box-shadow: 0 0 8px rgba(249, 115, 22, 0.4);
+    }
+
+    .particle:nth-child(1) {
+      top: 15%;
+      left: 10%;
+      animation: drift1 18s ease-in-out infinite;
+    }
+    .particle:nth-child(2) {
+      top: 60%;
+      left: 85%;
+      width: 3px;
+      height: 3px;
+      animation: drift2 22s ease-in-out infinite;
+      animation-delay: -4s;
+    }
+    .particle:nth-child(3) {
+      top: 80%;
+      left: 30%;
+      width: 5px;
+      height: 5px;
+      opacity: 0.25;
+      animation: drift3 25s ease-in-out infinite;
+      animation-delay: -8s;
+    }
+    .particle:nth-child(4) {
+      top: 25%;
+      left: 70%;
+      width: 3px;
+      height: 3px;
+      animation: drift4 20s ease-in-out infinite;
+      animation-delay: -2s;
+    }
+    .particle:nth-child(5) {
+      top: 45%;
+      left: 5%;
+      width: 4px;
+      height: 4px;
+      opacity: 0.30;
+      animation: drift5 28s ease-in-out infinite;
+      animation-delay: -10s;
+    }
+    .particle:nth-child(6) {
+      top: 90%;
+      left: 55%;
+      width: 3px;
+      height: 3px;
+      opacity: 0.20;
+      animation: drift6 24s ease-in-out infinite;
+      animation-delay: -6s;
+    }
+
+    @keyframes drift1 {
+      0%, 100% { transform: translate(0, 0); }
+      25%      { transform: translate(80px, 40px); }
+      50%      { transform: translate(30px, -60px); }
+      75%      { transform: translate(-50px, 20px); }
+    }
+    @keyframes drift2 {
+      0%, 100% { transform: translate(0, 0); }
+      25%      { transform: translate(-60px, -30px); }
+      50%      { transform: translate(-100px, 50px); }
+      75%      { transform: translate(40px, -20px); }
+    }
+    @keyframes drift3 {
+      0%, 100% { transform: translate(0, 0); }
+      33%      { transform: translate(90px, -70px); }
+      66%      { transform: translate(-40px, -30px); }
+    }
+    @keyframes drift4 {
+      0%, 100% { transform: translate(0, 0); }
+      25%      { transform: translate(-70px, 50px); }
+      50%      { transform: translate(20px, 90px); }
+      75%      { transform: translate(60px, -40px); }
+    }
+    @keyframes drift5 {
+      0%, 100% { transform: translate(0, 0); }
+      30%      { transform: translate(100px, -50px); }
+      60%      { transform: translate(60px, 60px); }
+    }
+    @keyframes drift6 {
+      0%, 100% { transform: translate(0, 0); }
+      40%      { transform: translate(-80px, -70px); }
+      70%      { transform: translate(50px, -30px); }
+    }
+
+    /* ─── MAIN CONTENT LAYER ───────────────────────── */
+    .content {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── HEADER ───────────────────────────────────── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 32px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      text-decoration: none;
+    }
+
+    .logo-bolt {
+      font-size: 1.2rem;
+      display: inline-block;
+      animation: boltPulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes boltPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.6; transform: scale(1.15); }
+    }
+
+    .header-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: right;
+      line-height: 1.5;
+    }
+
+    .header-meta span {
+      opacity: 0.5;
+      margin: 0 6px;
+    }
+
+    .header-divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--primary-30) 20%,
+        var(--primary) 50%,
+        var(--primary-30) 80%,
+        transparent 100%
+      );
+      margin: 0 32px;
+    }
+
+    /* ─── HERO ─────────────────────────────────────── */
+    .hero {
+      text-align: center;
+      padding: 56px 24px 32px;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.2;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--primary), #fb923c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 0 auto 28px;
+      line-height: 1.7;
+    }
+
+    .hero-sub strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* ─── URGENCY BANNER ───────────────────────────── */
+    .urgency-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(249, 115, 22, 0.08));
+      border: 1px solid var(--primary-30);
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 0.92rem;
+      padding: 10px 24px;
+      border-radius: 999px;
+      animation: badgePulse 3s ease-in-out infinite;
+      cursor: default;
+      user-select: none;
+    }
+
+    @keyframes badgePulse {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.25);
+        transform: scale(1);
+      }
+      50% {
+        box-shadow: 0 0 20px 4px rgba(249, 115, 22, 0.12);
+        transform: scale(1.02);
+      }
+    }
+
+    /* ─── MAIN CARD ────────────────────────────────── */
+    .card-wrapper {
+      display: flex;
+      justify-content: center;
+      padding: 24px 24px 48px;
+      flex: 1;
+    }
+
+    .card {
+      background: var(--secondary);
+      border: 1px solid var(--primary-30);
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 640px;
+      box-shadow:
+        0 0 40px rgba(249, 115, 22, 0.06),
+        0 0 80px rgba(249, 115, 22, 0.03),
+        0 4px 32px rgba(0, 0, 0, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Subtle top-edge glow line */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 10%;
+      right: 10%;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        var(--primary-30),
+        var(--primary),
+        var(--primary-30),
+        transparent
+      );
+    }
+
+    /* ─── PROGRESS BAR ──────────────────────────── */
+    .form-progress-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #f97316, #fb923c);
+      border-radius: 3px 3px 0 0;
+      transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 10px rgba(249, 115, 22, 0.5);
+      z-index: 10;
+    }
+
+    /* ─── STEP INDICATOR ────────────────────────── */
+    .step-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 32px;
+      padding-top: 8px;
+    }
+
+    .step-dot {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+    }
+
+    .step-dot-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 2px solid rgba(148, 163, 184, 0.3);
+      color: var(--text-muted);
+      background: transparent;
+      transition: all 0.35s ease;
+    }
+
+    .step-dot.active .step-dot-circle {
+      border-color: var(--primary);
+      background: rgba(249, 115, 22, 0.15);
+      color: var(--primary);
+      box-shadow: 0 0 16px rgba(249, 115, 22, 0.25);
+    }
+
+    .step-dot.completed .step-dot-circle {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #0a0a0f;
+    }
+
+    .step-dot-label {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      text-align: center;
+      transition: color 0.35s ease;
+      white-space: nowrap;
+    }
+
+    .step-dot.active .step-dot-label {
+      color: var(--primary);
+    }
+
+    .step-dot.completed .step-dot-label {
+      color: rgba(249, 115, 22, 0.7);
+    }
+
+    .step-connector {
+      width: 48px;
+      height: 2px;
+      background: rgba(148, 163, 184, 0.2);
+      margin-bottom: 22px;
+      flex-shrink: 0;
+      transition: background 0.35s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .step-connector.filled::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--primary);
+      animation: connectorFill 0.4s ease forwards;
+    }
+
+    @keyframes connectorFill {
+      from { transform: scaleX(0); transform-origin: left; }
+      to   { transform: scaleX(1); transform-origin: left; }
+    }
+
+    /* ─── FORM STEPS CONTAINER ──────────────────── */
+    .form-steps-container {
+      overflow: hidden;
+      position: relative;
+    }
+
+    .form-step {
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+      animation-duration: 0.32s;
+      animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      animation-fill-mode: both;
+    }
+
+    .form-step.active {
+      display: flex;
+    }
+
+    .form-step.slide-in-right {
+      animation-name: slideInRight;
+    }
+
+    .form-step.slide-in-left {
+      animation-name: slideInLeft;
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(48px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-48px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ─── STEP LABEL ────────────────────────────── */
+    .form-step-label {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.45;
+      letter-spacing: -0.2px;
+    }
+
+    .form-step-counter {
+      font-size: 0.72rem;
+      color: var(--primary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: -8px;
+    }
+
+    /* ─── CUSTOM DROPDOWN ───────────────────────── */
+    .select-wrapper {
+      position: relative;
+    }
+
+    .form-select {
+      width: 100%;
+      background: #0f0f1a;
+      border: 1px solid rgba(249, 115, 22, 0.4);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      border-radius: 10px;
+      padding: 14px 48px 14px 16px;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      outline: none;
+      line-height: 1.5;
+    }
+
+    .form-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12), 0 0 20px rgba(249, 115, 22, 0.08);
+    }
+
+    .form-select option {
+      background: #0f0f1a;
+      color: var(--text-muted);
+    }
+
+    .form-select option:first-child {
+      color: rgba(148, 163, 184, 0.5);
+    }
+
+    /* Custom arrow */
+    .select-arrow {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--primary);
+      transition: transform 0.2s ease;
+    }
+
+    .select-wrapper:focus-within .select-arrow {
+      transform: translateY(-50%) rotate(180deg);
+    }
+
+    /* Shake animation for validation */
+    .select-wrapper.shake {
+      animation: shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      15%      { transform: translateX(-8px); }
+      30%      { transform: translateX(8px); }
+      45%      { transform: translateX(-6px); }
+      60%      { transform: translateX(6px); }
+      75%      { transform: translateX(-3px); }
+      90%      { transform: translateX(3px); }
+    }
+
+    .form-select.error {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+    }
+
+    /* ─── BUTTONS ───────────────────────────────── */
+    .form-btn-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .btn-next {
+      flex: 1;
+      background: linear-gradient(135deg, #f97316, #ea6c0a);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 28px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.97rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+      letter-spacing: 0.1px;
+    }
+
+    .btn-next:hover {
+      background: linear-gradient(135deg, #fb8a2e, #f97316);
+      box-shadow: 0 4px 20px rgba(249, 115, 22, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .btn-next:active {
+      transform: translateY(0);
+    }
+
+    .btn-back {
+      background: rgba(148, 163, 184, 0.1);
+      color: var(--text-muted);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.97rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-back:hover {
+      background: rgba(148, 163, 184, 0.18);
+      color: var(--text);
+    }
+
+    .btn-back[hidden] {
+      display: none;
+    }
+
+    /* ─── FOOTER ───────────────────────────────────── */
+    .footer {
+      text-align: center;
+      padding: 24px 24px 32px;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      line-height: 1.8;
+    }
+
+    .footer p {
+      max-width: 480px;
+      margin: 0 auto;
+      opacity: 0.7;
+    }
+
+    .footer a {
+      color: var(--primary);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--primary-30);
+      transition: opacity 0.2s;
+    }
+
+    .footer a:hover {
+      opacity: 0.8;
+    }
+
+    .footer-divider {
+      width: 40px;
+      height: 1px;
+      background: var(--primary-30);
+      margin: 12px auto;
+    }
+
+    /* ─── RESPONSIVE ───────────────────────────────── */
+    @media (max-width: 640px) {
+      .header {
+        padding: 16px 20px;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .header-meta {
+        text-align: center;
+        font-size: 0.72rem;
+      }
+
+      .header-meta span {
+        display: none;
+      }
+
+      .header-meta br { display: block; }
+
+      .header-divider {
+        margin: 0 20px;
+      }
+
+      .hero {
+        padding: 36px 20px 24px;
+      }
+
+      .card {
+        padding: 28px 20px;
+      }
+
+      .globe-container {
+        width: 400px;
+        height: 400px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .logo {
+        font-size: 1.3rem;
+      }
+
+      .urgency-badge {
+        font-size: 0.82rem;
+        padding: 8px 18px;
+      }
+
+      .globe-container {
+        width: 300px;
+        height: 300px;
+      }
+    }
+
+    /* ─── ENTRANCE ANIMATIONS ──────────────────────── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.8s ease forwards;
+    }
+
+    .fade-up-d1 { animation-delay: 0.1s; }
+    .fade-up-d2 { animation-delay: 0.25s; }
+    .fade-up-d3 { animation-delay: 0.4s; }
+    .fade-up-d4 { animation-delay: 0.55s; }
+    .fade-up-d5 { animation-delay: 0.7s; }
+
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ─── RESULT PAGE ───────────────────────────────── */
+    .result-section {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Status banner */
+    .result-banner {
+      border-radius: 12px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      line-height: 1.5;
+    }
+    .result-banner.applies {
+      background: rgba(34, 197, 94, 0.10);
+      border: 1px solid rgba(34, 197, 94, 0.30);
+    }
+    .result-banner.not-applies {
+      background: rgba(96, 165, 250, 0.10);
+      border: 1px solid rgba(96, 165, 250, 0.30);
+    }
+    .result-banner-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 1px; }
+    .result-banner-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .result-banner-phase {
+      font-size: 0.88rem;
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .result-banner-sub {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Countdown section */
+    .countdown-block {
+      text-align: center;
+      padding: 24px 0 8px;
+    }
+    .countdown-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .countdown-deadline {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.5px;
+      margin-bottom: 20px;
+    }
+    .countdown-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .countdown-box {
+      background: #0f0f1a;
+      border: 1px solid rgba(249, 115, 22, 0.30);
+      border-radius: 8px;
+      padding: 14px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .countdown-num {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      min-width: 2.5ch;
+      display: inline-block;
+      text-align: center;
+    }
+    .countdown-unit {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 500;
+    }
+    .countdown-penalty {
+      font-size: 0.82rem;
+      color: var(--danger);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .countdown-grace {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Action cards */
+    .actions-heading {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+      margin-top: 8px;
+    }
+    .action-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: #0f0f1a;
+      border: 1px solid rgba(249, 115, 22, 0.15);
+      border-left: 3px solid var(--primary);
+      border-radius: 10px;
+      padding: 14px 16px;
+      opacity: 0;
+      animation: fadeInUp 0.5s ease forwards;
+    }
+    .action-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(249, 115, 22, 0.15);
+      border: 1.5px solid rgba(249, 115, 22, 0.5);
+      color: var(--primary);
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .action-text {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Software warning box */
+    .software-box {
+      background: rgba(249, 115, 22, 0.08);
+      border: 1px solid rgba(249, 115, 22, 0.30);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 0.87rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .software-box a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      border-bottom: 1px dashed rgba(249, 115, 22, 0.4);
+      transition: opacity 0.2s;
+    }
+    .software-box a:hover { opacity: 0.75; }
+
+    /* Grace period box */
+    .grace-box {
+      background: rgba(34, 197, 94, 0.08);
+      border: 1px solid rgba(34, 197, 94, 0.25);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      color: rgba(34, 197, 94, 0.85);
+      font-weight: 500;
+    }
+
+    /* Result buttons */
+    .result-btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .btn-letter {
+      width: 100%;
+      background: linear-gradient(135deg, #f97316, #ea6c0a);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 15px 28px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.97rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    }
+    .btn-letter:hover {
+      background: linear-gradient(135deg, #fb8a2e, #f97316);
+      box-shadow: 0 4px 20px rgba(249, 115, 22, 0.30);
+      transform: translateY(-1px);
+    }
+    .btn-restart {
+      width: 100%;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 12px;
+      padding: 13px 28px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.97rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .btn-restart:hover {
+      background: rgba(148, 163, 184, 0.10);
+      color: var(--text);
+    }
+
+    /* Divider inside result card */
+    .result-divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(249, 115, 22, 0.10);
+      margin: 4px 0;
+    }
+
+    @media (max-width: 480px) {
+      .countdown-grid { gap: 6px; }
+      .countdown-num  { font-size: 1.5rem; }
+      .countdown-box  { padding: 10px 4px; }
+    }
+
+    /* ─── SPINNER (WebLLM loading state) ─────────── */
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(249, 115, 22, 0.20);
+      border-top-color: #f97316;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .edge-loading-box {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .edge-loading-box p { margin-top: 16px; }
+    .edge-fallback-box {
+      background: #1a1a2e;
+      border: 1px solid rgba(249, 115, 22, 0.30);
+      border-radius: 16px;
+      padding: 32px;
+      text-align: center;
+    }
+    .edge-fallback-box a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    .edge-fallback-box a:hover { opacity: 0.8; }
+
+    /* ─── LETTER MODAL ────────────────────────────── */
+    .letter-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: overlayIn 0.2s ease;
+    }
+    @keyframes overlayIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    .letter-modal {
+      background: #1a1a2e;
+      border: 1px solid rgba(249, 115, 22, 0.40);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      animation: modalIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(24px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .letter-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid rgba(249, 115, 22, 0.15);
+      flex-shrink: 0;
+    }
+    .letter-modal-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .letter-modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      line-height: 1;
+      transition: color 0.15s, background 0.15s;
+    }
+    .letter-modal-close:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .letter-modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .letter-text {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      line-height: 1.85;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .letter-footer {
+      padding: 16px 24px 20px;
+      border-top: 1px solid rgba(249, 115, 22, 0.15);
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .btn-copy-letter {
+      flex: 1;
+      background: linear-gradient(135deg, #f97316, #ea6c0a);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-copy-letter:hover {
+      background: linear-gradient(135deg, #fb8a2e, #f97316);
+      transform: translateY(-1px);
+    }
+    .btn-copy-letter.copied {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+    }
+    .btn-print-letter {
+      flex: 1;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 10px;
+      padding: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-print-letter:hover {
+      background: rgba(148, 163, 184, 0.10);
+      color: var(--text);
+    }
+
+    /* ─── PRINT STYLES ───────────────────────────── */
+    @media print {
+      body > *:not(#letter-print-area) { display: none !important; }
+      #letter-print-area {
+        display: block !important;
+        position: fixed;
+        inset: 0;
+        background: #fff;
+        color: #000;
+        font-family: Georgia, serif;
+        font-size: 12pt;
+        line-height: 1.8;
+        padding: 40px;
+        z-index: 9999;
+        white-space: pre-wrap;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ ANIMATED GLOBE BACKGROUND ═══ -->
+  <div class="globe-container" aria-hidden="true">
+    <svg class="globe-svg" viewBox="0 0 700 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Outer circle -->
+      <circle cx="350" cy="350" r="280" stroke="#f97316" stroke-opacity="0.08" stroke-width="1" />
+
+      <!-- Latitude lines -->
+      <ellipse cx="350" cy="350" rx="280" ry="60" stroke="#f97316" stroke-opacity="0.08" stroke-width="0.8" />
+      <ellipse cx="350" cy="350" rx="280" ry="120" stroke="#f97316" stroke-opacity="0.08" stroke-width="0.8" />
+      <ellipse cx="350" cy="350" rx="280" ry="180" stroke="#f97316" stroke-opacity="0.08" stroke-width="0.8" />
+      <ellipse cx="350" cy="350" rx="280" ry="240" stroke="#f97316" stroke-opacity="0.08" stroke-width="0.8" />
+
+      <!-- Longitude lines (inner group rotates differently) -->
+      <g class="globe-inner">
+        <ellipse cx="350" cy="350" rx="60" ry="280" stroke="#f97316" stroke-opacity="0.08" stroke-width="0.8" />
+        <ellipse cx="350" cy="350" rx="120" ry="280" stroke="#f97316" stroke-opacity="0.08" stroke-width="0.8" />
+        <ellipse cx="350" cy="350" rx="180" ry="280" stroke="#f97316" stroke-opacity="0.08" stroke-width="0.8" />
+        <ellipse cx="350" cy="350" rx="240" ry="280" stroke="#f97316" stroke-opacity="0.08" stroke-width="0.8" />
+      </g>
+
+      <!-- Equator (slightly more visible) -->
+      <ellipse cx="350" cy="350" rx="280" ry="4" stroke="#f97316" stroke-opacity="0.12" stroke-width="1" />
+
+      <!-- Prime meridian -->
+      <ellipse cx="350" cy="350" rx="4" ry="280" stroke="#f97316" stroke-opacity="0.12" stroke-width="1" />
+
+      <!-- Additional diagonal longitude lines for depth -->
+      <ellipse cx="350" cy="350" rx="200" ry="280" stroke="#f97316" stroke-opacity="0.05" stroke-width="0.6" transform="rotate(30 350 350)" />
+      <ellipse cx="350" cy="350" rx="200" ry="280" stroke="#f97316" stroke-opacity="0.05" stroke-width="0.6" transform="rotate(-30 350 350)" />
+      <ellipse cx="350" cy="350" rx="200" ry="280" stroke="#f97316" stroke-opacity="0.05" stroke-width="0.6" transform="rotate(60 350 350)" />
+      <ellipse cx="350" cy="350" rx="200" ry="280" stroke="#f97316" stroke-opacity="0.05" stroke-width="0.6" transform="rotate(-60 350 350)" />
+    </svg>
+  </div>
+
+  <!-- ═══ RADIAL OVERLAY ═══ -->
+  <div class="radial-overlay" aria-hidden="true"></div>
+
+  <!-- ═══ FLOATING PARTICLES ═══ -->
+  <div class="particles" aria-hidden="true">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <!-- ═══ MAIN CONTENT ═══ -->
+  <div class="content">
+
+    <!-- HEADER -->
+    <header class="header fade-up fade-up-d1" id="header">
+      <a href="#" class="logo" id="logo">
+        TaxPlain <span class="logo-bolt">⚡</span>
+      </a>
+      <div class="header-meta" id="header-meta">
+        Powered by Phi-4 Mini <span>·</span> Runs locally <span>·</span> Free forever
+      </div>
+    </header>
+    <div class="header-divider fade-up fade-up-d1" role="separator"></div>
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+      <h1 class="fade-up fade-up-d2">
+        <em>Making Tax Digital</em> — explained&nbsp;for&nbsp;you
+      </h1>
+      <p class="hero-sub fade-up fade-up-d3">
+        <strong>864,000</strong> UK sole traders and landlords must comply from <strong>April 2026</strong>. 
+        Find out exactly what this means for you in <strong>10&nbsp;seconds</strong>.
+      </p>
+      <div class="fade-up fade-up-d4">
+        <div class="urgency-badge" id="urgency-badge">
+          ⚠️ First deadline: 7 August 2026
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN CARD -->
+    <div class="card-wrapper fade-up fade-up-d5">
+      <div class="card" id="main-card">
+
+        <!-- Progress Bar -->
+        <div class="form-progress-bar" id="form-progress" style="width: 25%;"></div>
+
+        <!-- Step Indicator -->
+        <div class="step-indicator" id="step-indicator">
+          <div class="step-dot active" id="dot-1">
+            <div class="step-dot-circle" id="dot-circle-1">1</div>
+            <div class="step-dot-label">Income</div>
+          </div>
+          <div class="step-connector" id="connector-1"></div>
+          <div class="step-dot" id="dot-2">
+            <div class="step-dot-circle" id="dot-circle-2">2</div>
+            <div class="step-dot-label">Earnings</div>
+          </div>
+          <div class="step-connector" id="connector-2"></div>
+          <div class="step-dot" id="dot-3">
+            <div class="step-dot-circle" id="dot-circle-3">3</div>
+            <div class="step-dot-label">Software</div>
+          </div>
+          <div class="step-connector" id="connector-3"></div>
+          <div class="step-dot" id="dot-4">
+            <div class="step-dot-circle" id="dot-circle-4">4</div>
+            <div class="step-dot-label">HMRC</div>
+          </div>
+        </div>
+
+        <!-- Steps Container -->
+        <div class="form-steps-container">
+
+          <!-- STEP 1 -->
+          <div class="form-step active slide-in-right" id="step-1">
+            <div class="form-step-counter">Step 1 of 4</div>
+            <label class="form-step-label" for="select-1">
+              What best describes your income situation?
+            </label>
+            <div class="select-wrapper" id="wrapper-1">
+              <select class="form-select" id="select-1">
+                <option value="">Select your income type...</option>
+                <option value="sole_trader">Sole trader (self-employed)</option>
+                <option value="landlord">Landlord (property rental income)</option>
+                <option value="both">Both sole trader and landlord</option>
+                <option value="employed_side">Employed with self-employed side income</option>
+              </select>
+              <svg class="select-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M4 6l4 4 4-4" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="form-btn-group">
+              <button class="btn-back" id="back-1" hidden>← Back</button>
+              <button class="btn-next" id="next-1">Next →</button>
+            </div>
+          </div>
+
+          <!-- STEP 2 -->
+          <div class="form-step" id="step-2">
+            <div class="form-step-counter">Step 2 of 4</div>
+            <label class="form-step-label" for="select-2">
+              What was your total qualifying income in 2024–25?
+            </label>
+            <div class="select-wrapper" id="wrapper-2">
+              <select class="form-select" id="select-2">
+                <option value="">Select your income range...</option>
+                <option value="under_20k">Under £20,000</option>
+                <option value="20k_30k">£20,000 – £30,000</option>
+                <option value="30k_50k">£30,000 – £50,000</option>
+                <option value="over_50k">Over £50,000</option>
+              </select>
+              <svg class="select-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M4 6l4 4 4-4" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="form-btn-group">
+              <button class="btn-back" id="back-2">← Back</button>
+              <button class="btn-next" id="next-2">Next →</button>
+            </div>
+          </div>
+
+          <!-- STEP 3 -->
+          <div class="form-step" id="step-3">
+            <div class="form-step-counter">Step 3 of 4</div>
+            <label class="form-step-label" for="select-3">
+              Do you currently use accounting software?
+            </label>
+            <div class="select-wrapper" id="wrapper-3">
+              <select class="form-select" id="select-3">
+                <option value="">Select your current setup...</option>
+                <option value="named_software">Yes — I use named software (QuickBooks, Xero, FreeAgent, etc.)</option>
+                <option value="spreadsheets">Yes — I use spreadsheets only</option>
+                <option value="none">No — I use paper or nothing</option>
+              </select>
+              <svg class="select-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M4 6l4 4 4-4" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="form-btn-group">
+              <button class="btn-back" id="back-3">← Back</button>
+              <button class="btn-next" id="next-3">Next →</button>
+            </div>
+          </div>
+
+          <!-- STEP 4 -->
+          <div class="form-step" id="step-4">
+            <div class="form-step-counter">Step 4 of 4</div>
+            <label class="form-step-label" for="select-4">
+              Are you registered for Self Assessment with HMRC?
+            </label>
+            <div class="select-wrapper" id="wrapper-4">
+              <select class="form-select" id="select-4">
+                <option value="">Select your status...</option>
+                <option value="registered">Yes, I am registered</option>
+                <option value="not_registered">No, I am not registered</option>
+                <option value="not_sure">I'm not sure</option>
+              </select>
+              <svg class="select-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M4 6l4 4 4-4" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="form-btn-group">
+              <button class="btn-back" id="back-4">← Back</button>
+              <button class="btn-next" id="next-4">See My Result →</button>
+            </div>
+          </div>
+
+        </div><!-- /form-steps-container -->
+      </div>
+    </div>
+
+    <!-- RESULT SECTION (hidden until form is submitted) -->
+    <div id="result-section" style="display:none;" class="card-wrapper">
+      <div class="card" id="result-card">
+        <!-- Progress bar stays at 100% on result -->
+        <div class="form-progress-bar" style="width:100%;"></div>
+        <div id="result-content" class="result-section"></div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer" id="footer">
+      <p>
+        Not legal advice. Based on HMRC guidance as of May 2026.<br />
+        Data never leaves your device.
+      </p>
+      <div class="footer-divider"></div>
+      <p>
+        <a href="#" id="github-link">[ GitHub Repo ]</a>
+      </p>
+    </footer>
+
+  </div>
+
+  <script>
+    /* ═══════════════════════════════════════════════════════════
+       PROFILE CACHE — 12 pre-generated MTD profiles
+    ═══════════════════════════════════════════════════════════ */
+    var PROFILE_CACHE = {
+      "sole_trader_over50k": {
+        applies: true,
+        phase: "NOW — April 2026",
+        deadline: "7 August 2026",
+        software_needed: true,
+        actions: [
+          "Register for MTD for Income Tax on HMRC website immediately",
+          "Choose HMRC-approved software (FreeAgent, QuickBooks, Xero)",
+          "Start keeping digital records from 6 April 2026"
+        ],
+        grace_period: "No penalty points in first 12 months (2026\u201327 only)"
+      },
+      "sole_trader_30k_50k": {
+        applies: true,
+        phase: "NOW — April 2026",
+        deadline: "7 August 2026",
+        software_needed: true,
+        actions: [
+          "Register for MTD for Income Tax on HMRC website immediately",
+          "Choose HMRC-approved software from HMRC approved list",
+          "Start keeping digital records from 6 April 2026"
+        ],
+        grace_period: "No penalty points in first 12 months (2026\u201327 only)"
+      },
+      "sole_trader_20k_30k": {
+        applies: true,
+        phase: "April 2027",
+        deadline: "7 August 2027",
+        software_needed: true,
+        actions: [
+          "You have until April 2027 \u2014 start preparing now",
+          "Research HMRC-approved software options",
+          "Register for Self Assessment if not already done"
+        ],
+        grace_period: "Grace period details TBC for 2027 phase"
+      },
+      "sole_trader_under20k": {
+        applies: true,
+        phase: "April 2028",
+        deadline: "7 August 2028",
+        software_needed: true,
+        actions: [
+          "You have until April 2028 \u2014 monitor HMRC updates",
+          "Start using digital records now to get ahead",
+          "Check HMRC website in late 2026 for confirmed guidance"
+        ],
+        grace_period: "Grace period details TBC for 2028 phase"
+      },
+      "landlord_over50k": {
+        applies: true,
+        phase: "NOW — April 2026",
+        deadline: "7 August 2026",
+        software_needed: true,
+        actions: [
+          "Register for MTD for Income Tax on HMRC website immediately",
+          "Choose HMRC-approved landlord software",
+          "Ensure all rental income is tracked digitally from 6 April 2026"
+        ],
+        grace_period: "No penalty points in first 12 months (2026\u201327 only)"
+      },
+      "landlord_30k_50k": {
+        applies: true,
+        phase: "NOW — April 2026",
+        deadline: "7 August 2026",
+        software_needed: true,
+        actions: [
+          "Register for MTD for Income Tax immediately",
+          "Choose HMRC-approved software for landlords",
+          "Track all rental income digitally from 6 April 2026"
+        ],
+        grace_period: "No penalty points in first 12 months (2026\u201327 only)"
+      },
+      "landlord_20k_30k": {
+        applies: true,
+        phase: "April 2027",
+        deadline: "7 August 2027",
+        actions: [
+          "Prepare digital records now",
+          "Research landlord-specific MTD software",
+          "Register for Self Assessment if not done"
+        ],
+        grace_period: "Grace period TBC for 2027 phase"
+      },
+      "landlord_under20k": {
+        applies: true,
+        phase: "April 2028",
+        deadline: "7 August 2028",
+        actions: [
+          "Monitor HMRC updates through 2026",
+          "Start digital records early to get ahead",
+          "Check if furnished holiday let exemption applies to you"
+        ],
+        grace_period: "Grace period TBC for 2028 phase"
+      },
+      "both_over50k": {
+        applies: true,
+        phase: "NOW — April 2026",
+        deadline: "7 August 2026",
+        software_needed: true,
+        actions: [
+          "Register for MTD immediately \u2014 both income streams affected",
+          "Choose software that handles both trading and rental income",
+          "You may need separate reporting for each income stream"
+        ],
+        grace_period: "No penalty points in first 12 months (2026\u201327 only)"
+      },
+      "both_under50k": {
+        applies: true,
+        phase: "April 2027",
+        deadline: "7 August 2027",
+        actions: [
+          "Combined income may push you into earlier phase \u2014 verify with HMRC",
+          "Start digital records for both income streams now",
+          "Seek accountant advice for combined income reporting"
+        ],
+        grace_period: "Grace period TBC"
+      },
+      "employed_side_over50k": {
+        applies: true,
+        phase: "NOW — April 2026",
+        deadline: "7 August 2026",
+        actions: [
+          "Your self-employed side income qualifies for MTD",
+          "Register for MTD for Income Tax on HMRC website",
+          "Your employment income is separate \u2014 only side income is reported via MTD"
+        ],
+        grace_period: "No penalty points in first 12 months (2026\u201327 only)"
+      },
+      "employed_side_under50k": {
+        applies: false,
+        phase: "Not yet \u2014 monitor HMRC",
+        deadline: null,
+        actions: [
+          "MTD does not apply to you yet based on current thresholds",
+          "Monitor HMRC guidance as thresholds drop to \u00a330k (2027) and \u00a320k (2028)",
+          "Ensure you are still filing Self Assessment annually as required"
+        ],
+        grace_period: null
+      }
+    };
+
+    /* ═══════════════════════════════════════════════════════════
+       DECISION TREE — maps form answers to a cache key
+    ═══════════════════════════════════════════════════════════ */
+    function getProfile(incomeType, incomeRange, software, selfAssessment) {
+      var key = '';
+
+      if (incomeType === 'sole_trader') {
+        if (incomeRange === 'over_50k' || incomeRange === '30k_50k') key = 'sole_trader_over50k';
+        else if (incomeRange === '20k_30k') key = 'sole_trader_20k_30k';
+        else key = 'sole_trader_under20k';
+      } else if (incomeType === 'landlord') {
+        if (incomeRange === 'over_50k' || incomeRange === '30k_50k') key = 'landlord_over50k';
+        else if (incomeRange === '20k_30k') key = 'landlord_20k_30k';
+        else key = 'landlord_under20k';
+      } else if (incomeType === 'both') {
+        if (incomeRange === 'over_50k' || incomeRange === '30k_50k') key = 'both_over50k';
+        else key = 'both_under50k';
+      } else if (incomeType === 'employed_side') {
+        if (incomeRange === 'over_50k') key = 'employed_side_over50k';
+        else key = 'employed_side_under50k';
+      }
+
+      return PROFILE_CACHE[key] || null;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       FORM CONTROLLER — step navigation, validation, result
+    ═══════════════════════════════════════════════════════════ */
+    (function () {
+      var TOTAL = 4;
+      var current = 1;
+      var currentProfile = null;
+
+      /* Stored form answers — hoisted so letter generator can read them */
+      var _incomeType  = '';
+      var _incomeRange = '';
+      var _software    = '';
+      var _hmrcStatus  = '';
+
+      /* ── helpers ────────────────────────────────── */
+      function $(id) { return document.getElementById(id); }
+
+      function setProgress(step) {
+        $('form-progress').style.width = ((step / TOTAL) * 100) + '%';
+      }
+
+      function updateIndicator(newStep, oldStep) {
+        var oldDot = $('dot-' + oldStep);
+        oldDot.classList.remove('active');
+        if (newStep > oldStep) {
+          oldDot.classList.add('completed');
+          $('dot-circle-' + oldStep).textContent = '\u2713';
+          var connIdx = Math.min(oldStep, newStep - 1);
+          var conn = $('connector-' + connIdx);
+          if (conn) conn.classList.add('filled');
+        } else {
+          $('dot-' + newStep).classList.remove('completed');
+          $('dot-circle-' + newStep).textContent = newStep;
+          var connToRemove = $('connector-' + newStep);
+          if (connToRemove) connToRemove.classList.remove('filled');
+        }
+        var newDot = $('dot-' + newStep);
+        newDot.classList.remove('completed');
+        newDot.classList.add('active');
+      }
+
+      function showStep(newStep, dir) {
+        var oldStep = current;
+        var animClass = dir === 'forward' ? 'slide-in-right' : 'slide-in-left';
+        var currentEl = $('step-' + oldStep);
+        currentEl.classList.remove('active', 'slide-in-right', 'slide-in-left');
+        var newEl = $('step-' + newStep);
+        newEl.classList.remove('slide-in-right', 'slide-in-left');
+        void newEl.offsetWidth;
+        newEl.classList.add('active', animClass);
+        updateIndicator(newStep, oldStep);
+        setProgress(newStep);
+        current = newStep;
+      }
+
+      function validate(step) {
+        var sel = $('select-' + step);
+        if (!sel.value) {
+          var wrapper = $('wrapper-' + step);
+          sel.classList.add('error');
+          wrapper.classList.remove('shake');
+          void wrapper.offsetWidth;
+          wrapper.classList.add('shake');
+          wrapper.addEventListener('animationend', function () {
+            wrapper.classList.remove('shake');
+          }, { once: true });
+          return false;
+        }
+        $('select-' + step).classList.remove('error');
+        return true;
+      }
+
+      /* ── Clear error on change ───────────────────── */
+      for (var i = 1; i <= TOTAL; i++) {
+        (function (idx) {
+          var sel = $('select-' + idx);
+          if (sel) {
+            sel.addEventListener('change', function () {
+              sel.classList.remove('error');
+            });
+          }
+        })(i);
+      }
+
+      /* ── Next buttons ───────────────────────────── */
+      for (var s = 1; s <= TOTAL; s++) {
+        (function (step) {
+          var nextBtn = $('next-' + step);
+          if (!nextBtn) return;
+          nextBtn.addEventListener('click', function () {
+            if (!validate(step)) return;
+            if (step === TOTAL) {
+              handleResult();
+              return;
+            }
+            showStep(step + 1, 'forward');
+          });
+        })(s);
+      }
+
+      /* ── Back buttons ───────────────────────────── */
+      for (var b = 2; b <= TOTAL; b++) {
+        (function (step) {
+          var backBtn = $('back-' + step);
+          if (!backBtn) return;
+          backBtn.addEventListener('click', function () {
+            showStep(step - 1, 'backward');
+          });
+        })(b);
+      }
+
+      /* ── Result handler ─────────────────────────── */
+      function handleResult() {
+        _incomeType  = $('select-1').value;
+        _incomeRange = $('select-2').value;
+        _software    = $('select-3').value;
+        _hmrcStatus  = $('select-4').value;
+
+        currentProfile = getProfile(_incomeType, _incomeRange, _software, _hmrcStatus);
+
+        console.log('TaxPlain profile:', currentProfile);
+
+        // Hide form card, show result section
+        $('main-card').parentElement.style.display = 'none';
+        $('result-section').style.display = 'flex';
+
+        if (currentProfile) {
+          renderResult(currentProfile);
+        } else {
+          if (typeof window.__taxplainEdgeCase === 'function') {
+            window.__taxplainEdgeCase(_incomeType, _incomeRange, _software, _hmrcStatus);
+          } else {
+            $('result-content').innerHTML = '<div class="edge-fallback-box"><p style="color:var(--primary);font-size:1.1rem;">&#x26A0;&#xFE0F; Your situation is complex</p><p style="color:var(--text);margin-top:12px;">Your income profile involves edge cases that require professional advice.</p><p style="color:var(--text-muted);margin-top:12px;">Visit <a href="https://www.gov.uk/guidance/check-if-youre-eligible-for-making-tax-digital-for-income-tax" target="_blank">HMRC\'s official MTD guidance</a>.</p><button id="btn-restart-edge" style="margin-top:20px;background:transparent;border:1px solid rgba(148,163,184,0.3);color:var(--text-muted);padding:12px 24px;border-radius:8px;cursor:pointer;font-family:inherit;">&larr; Start Over</button></div>';
+            document.getElementById('btn-restart-edge').addEventListener('click', restartForm);
+          }
+        }
+      }
+
+      /* ── Render result UI ───────────────────────── */
+      function renderResult(p) {
+        var container = $('result-content');
+        container.innerHTML = '';
+
+        if (!p) {
+          container.innerHTML = '<p style="color:var(--danger);text-align:center;">Could not determine your profile. Please try again.</p>';
+          return;
+        }
+
+        var html = '';
+
+        /* 1. STATUS BANNER */
+        if (p.applies) {
+          html += '<div class="result-banner applies">';
+          html += '  <div class="result-banner-icon">&#x2705;</div>';
+          html += '  <div>';
+          html += '    <div class="result-banner-title">MTD Applies to You</div>';
+          html += '    <div class="result-banner-phase">Starting: ' + esc(p.phase) + '</div>';
+          html += '  </div>';
+          html += '</div>';
+        } else {
+          html += '<div class="result-banner not-applies">';
+          html += '  <div class="result-banner-icon">&#x2139;&#xFE0F;</div>';
+          html += '  <div>';
+          html += '    <div class="result-banner-title">MTD Does Not Apply to You Yet</div>';
+          html += '    <div class="result-banner-sub">Monitor HMRC guidance — thresholds will drop over time.</div>';
+          html += '    <div class="result-banner-phase">' + esc(p.phase) + '</div>';
+          html += '  </div>';
+          html += '</div>';
+        }
+
+        /* 2. COUNTDOWN CLOCK */
+        if (p.applies && p.deadline) {
+          html += '<div class="result-divider"></div>';
+          html += '<div class="countdown-block">';
+          html += '  <div class="countdown-label">&#x23F0; Your First Deadline</div>';
+          html += '  <div class="countdown-deadline">' + esc(p.deadline) + '</div>';
+          html += '  <div class="countdown-grid" id="cd-grid">';
+          html += '    <div class="countdown-box"><span class="countdown-num" id="cd-days">--</span><span class="countdown-unit">Days</span></div>';
+          html += '    <div class="countdown-box"><span class="countdown-num" id="cd-hours">--</span><span class="countdown-unit">Hours</span></div>';
+          html += '    <div class="countdown-box"><span class="countdown-num" id="cd-mins">--</span><span class="countdown-unit">Mins</span></div>';
+          html += '    <div class="countdown-box"><span class="countdown-num" id="cd-secs">--</span><span class="countdown-unit">Secs</span></div>';
+          html += '  </div>';
+          html += '  <div class="countdown-penalty">&#x26A0;&#xFE0F; Miss 4 submissions &rarr; &pound;200 fine</div>';
+          if (p.grace_period) {
+            html += '  <div class="countdown-grace">Grace period: ' + esc(p.grace_period) + '</div>';
+          }
+          html += '</div>';
+        }
+
+        /* 3. NEXT ACTIONS */
+        if (p.actions && p.actions.length) {
+          html += '<div class="result-divider"></div>';
+          html += '<div class="actions-heading">Your Next ' + p.actions.length + ' Actions</div>';
+          for (var a = 0; a < p.actions.length; a++) {
+            html += '<div class="action-card" style="animation-delay:' + (a * 200) + 'ms">';
+            html += '  <div class="action-num">' + (a + 1) + '</div>';
+            html += '  <div class="action-text">' + esc(p.actions[a]) + '</div>';
+            html += '</div>';
+          }
+        }
+
+        /* 4. SOFTWARE STATUS */
+        if (p.software_needed) {
+          html += '<div class="result-divider"></div>';
+          html += '<div class="software-box">';
+          html += '  &#x1F4BB; <strong style="color:var(--primary)">You need HMRC-approved software.</strong> ';
+          html += '  HMRC will NOT provide their own software.<br>';
+          html += '  <a href="https://www.gov.uk/guidance/find-software-thats-compatible-with-making-tax-digital-for-income-tax" target="_blank" rel="noopener">View the approved list &rarr;</a>';
+          html += '</div>';
+        }
+
+        /* 5. GRACE PERIOD BOX (only if no countdown shown, or always show) */
+        if (p.grace_period && !p.deadline) {
+          html += '<div class="grace-box">&#x2713; Grace Period: ' + esc(p.grace_period) + '</div>';
+        } else if (p.grace_period && p.deadline) {
+          /* already shown inside countdown — skip duplication */
+        }
+
+        /* 6. BUTTONS */
+        html += '<div class="result-divider"></div>';
+        html += '<div class="result-btn-group">';
+        html += '  <button class="btn-letter" id="btn-letter">&#x1F4C4; Generate Accountant Letter</button>';
+        html += '  <button class="btn-restart" id="btn-restart">&larr; Start Over</button>';
+        html += '</div>';
+
+        container.innerHTML = html;
+
+        /* Wire buttons */
+        document.getElementById('btn-letter').addEventListener('click', function () {
+          openLetterModal(p);
+        });
+        document.getElementById('btn-restart').addEventListener('click', function () {
+          restartForm();
+        });
+
+        /* Start countdown if applicable */
+        if (p.applies && p.deadline && document.getElementById('cd-days')) {
+          startCountdown();
+        }
+      }
+
+      /* ── Countdown timer ─────────────────────────── */
+      var countdownTimer = null;
+      var DEADLINE_UTC = new Date('2026-08-07T18:00:00Z');
+
+      function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+      function tickCountdown() {
+        var now  = new Date();
+        var diff = DEADLINE_UTC - now;
+
+        if (diff <= 0) {
+          /* Deadline passed */
+          var els = ['cd-days','cd-hours','cd-mins','cd-secs'];
+          for (var i = 0; i < els.length; i++) {
+            var el = document.getElementById(els[i]);
+            if (el) el.textContent = '00';
+          }
+          clearInterval(countdownTimer);
+          return;
+        }
+
+        var days  = Math.floor(diff / 86400000);
+        var hours = Math.floor((diff % 86400000) / 3600000);
+        var mins  = Math.floor((diff % 3600000)  / 60000);
+        var secs  = Math.floor((diff % 60000)    / 1000);
+
+        var dEl = document.getElementById('cd-days');
+        var hEl = document.getElementById('cd-hours');
+        var mEl = document.getElementById('cd-mins');
+        var sEl = document.getElementById('cd-secs');
+
+        if (dEl) dEl.textContent = days;
+        if (hEl) hEl.textContent = pad(hours);
+        if (mEl) mEl.textContent = pad(mins);
+        if (sEl) sEl.textContent = pad(secs);
+      }
+
+      function startCountdown() {
+        if (countdownTimer) clearInterval(countdownTimer);
+        tickCountdown();
+        countdownTimer = setInterval(tickCountdown, 1000);
+      }
+
+      /* ── Escape HTML helper ──────────────────────── */
+      function esc(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      /* ── Restart form ────────────────────────────── */
+      function restartForm() {
+        /* Stop countdown */
+        if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+
+        /* Reset all selects */
+        for (var r = 1; r <= TOTAL; r++) {
+          var sel = $('select-' + r);
+          if (sel) sel.value = '';
+        }
+
+        /* Reset step indicator */
+        for (var d = 1; d <= TOTAL; d++) {
+          var dot = $('dot-' + d);
+          if (dot) {
+            dot.classList.remove('active', 'completed');
+            $('dot-circle-' + d).textContent = d;
+          }
+          if (d < TOTAL) {
+            var conn = $('connector-' + d);
+            if (conn) conn.classList.remove('filled');
+          }
+        }
+
+        /* Go back to step 1 */
+        var activeStep = $('step-' + current);
+        if (activeStep) activeStep.classList.remove('active', 'slide-in-right', 'slide-in-left');
+        current = 1;
+        var s1 = $('step-1');
+        if (s1) { s1.classList.remove('slide-in-right', 'slide-in-left'); void s1.offsetWidth; s1.classList.add('active', 'slide-in-right'); }
+        $('dot-1').classList.add('active');
+
+        /* Reset progress bar on form card */
+        $('form-progress').style.width = '25%';
+
+        /* Hide result, show form */
+        $('result-section').style.display = 'none';
+        $('main-card').parentElement.style.display = 'flex';
+      }
+
+      /* ── Expose bridge for ESM module ───────────── */
+      window.__taxplainRender  = renderResult;
+      window.__taxplainRestart = restartForm;
+
+      /* ── Letter generator ────────────────────────── */
+
+      var INCOME_LABELS = {
+        sole_trader:   'Sole trader (self-employed)',
+        landlord:      'Landlord (property rental income)',
+        both:          'Both sole trader and landlord',
+        employed_side: 'Employed with self-employed side income'
+      };
+      var RANGE_LABELS = {
+        under_20k: 'Under \u00a320,000',
+        '20k_30k': '\u00a320,000 \u2013 \u00a330,000',
+        '30k_50k': '\u00a330,000 \u2013 \u00a350,000',
+        over_50k:  'Over \u00a350,000'
+      };
+      var SOFTWARE_LABELS = {
+        named_software: 'Yes \u2014 uses named software (QuickBooks, Xero, FreeAgent, etc.)',
+        spreadsheets:   'Yes \u2014 uses spreadsheets only',
+        none:           'No \u2014 paper records or nothing'
+      };
+      var HMRC_LABELS = {
+        registered:     'Yes, registered for Self Assessment',
+        not_registered: 'No, not yet registered',
+        not_sure:       'Unsure'
+      };
+
+      function buildLetterText(p) {
+        var today = new Date();
+        var dateStr = today.toLocaleDateString('en-GB', {
+          day: 'numeric', month: 'long', year: 'numeric'
+        });
+
+        var itLabel  = INCOME_LABELS[_incomeType]   || _incomeType;
+        var irLabel  = RANGE_LABELS[_incomeRange]   || _incomeRange;
+        var swLabel  = SOFTWARE_LABELS[_software]   || _software;
+        var saLabel  = HMRC_LABELS[_hmrcStatus]     || _hmrcStatus;
+
+        var appliesStr = p.applies ? 'applies' : 'does not yet apply';
+
+        var lines = [];
+        lines.push(dateStr);
+        lines.push('');
+        lines.push('Dear Accountant / Tax Adviser,');
+        lines.push('');
+        lines.push('I am writing to request your assistance regarding Making Tax Digital (MTD) for Income Tax Self Assessment, which now affects my situation.');
+        lines.push('');
+        lines.push('My Profile:');
+        lines.push('  \u2022 Income type: ' + itLabel);
+        lines.push('  \u2022 Qualifying income (2024\u201325): ' + irLabel);
+        lines.push('  \u2022 Current record-keeping: ' + swLabel);
+        lines.push('  \u2022 Self Assessment status: ' + saLabel);
+        lines.push('');
+        lines.push('MTD Status:');
+        lines.push('Based on HMRC guidance, MTD ' + appliesStr + ' to me. The relevant phase is ' + p.phase + '.');
+        if (p.applies && p.deadline) {
+          lines.push('My first quarterly submission deadline is ' + p.deadline + '.');
+        }
+        lines.push('');
+        lines.push('Actions I Need Help With:');
+        if (p.actions && p.actions.length) {
+          for (var a = 0; a < p.actions.length; a++) {
+            lines.push((a + 1) + '. ' + p.actions[a]);
+          }
+        }
+        if (p.grace_period) {
+          lines.push('');
+          lines.push('Note: HMRC has confirmed a grace period \u2014 ' + p.grace_period + '.');
+        }
+        lines.push('');
+        if (p.software_needed) {
+          lines.push('I would be grateful if you could confirm whether this assessment is correct for my circumstances and advise on next steps, particularly regarding selecting appropriate HMRC-approved software.');
+        } else {
+          lines.push('I would be grateful if you could confirm whether this assessment is correct for my circumstances and advise on next steps.');
+        }
+        lines.push('');
+        var deadlineRef = (p.applies && p.deadline) ? p.deadline : 'the relevant phase date';
+        lines.push('Please note I have a deadline of ' + deadlineRef + ' and would appreciate your response at your earliest convenience.');
+        lines.push('');
+        lines.push('Yours sincerely,');
+        lines.push('');
+        lines.push('[Your name]');
+        lines.push('');
+        lines.push('\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015');
+        lines.push('Generated by TaxPlain \u00b7 taxplain.app');
+        lines.push('Based on HMRC guidance as of May 2026.');
+        lines.push('Not a substitute for professional advice.');
+        lines.push('\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015\u2015');
+
+        return lines.join('\n');
+      }
+
+      function openLetterModal(p) {
+        var letterText = buildLetterText(p);
+
+        /* Populate print area (hidden, used by @media print) */
+        var printArea = document.getElementById('letter-print-area');
+        if (printArea) printArea.textContent = letterText;
+
+        /* Build modal DOM */
+        var overlay = document.createElement('div');
+        overlay.className = 'letter-overlay';
+        overlay.id = 'letter-overlay';
+        overlay.innerHTML =
+          '<div class="letter-modal" role="dialog" aria-modal="true" aria-label="Accountant Letter">' +
+            '<div class="letter-modal-header">' +
+              '<span class="letter-modal-title">&#x1F4C4; Accountant Letter</span>' +
+              '<button class="letter-modal-close" id="letter-close-btn" aria-label="Close">&times;</button>' +
+            '</div>' +
+            '<div class="letter-modal-body">' +
+              '<pre class="letter-text" id="letter-pre"></pre>' +
+            '</div>' +
+            '<div class="letter-footer">' +
+              '<button class="btn-copy-letter" id="btn-copy-letter">&#x1F4CB; Copy Letter</button>' +
+              '<button class="btn-print-letter" id="btn-print-letter">&#x1F5A8;&#xFE0F; Print Letter</button>' +
+            '</div>' +
+          '</div>';
+
+        document.body.appendChild(overlay);
+        document.getElementById('letter-pre').textContent = letterText;
+
+        /* Close handlers */
+        function closeModal() {
+          var ol = document.getElementById('letter-overlay');
+          if (ol) ol.remove();
+        }
+        document.getElementById('letter-close-btn').addEventListener('click', closeModal);
+        overlay.addEventListener('click', function (e) {
+          if (e.target === overlay) closeModal();
+        });
+        document.addEventListener('keydown', function escHandler(e) {
+          if (e.key === 'Escape') { closeModal(); document.removeEventListener('keydown', escHandler); }
+        });
+
+        /* Copy button */
+        document.getElementById('btn-copy-letter').addEventListener('click', function () {
+          var btn = this;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(letterText).then(function () {
+              btn.textContent = '\u2713 Copied!';
+              btn.classList.add('copied');
+              setTimeout(function () {
+                btn.textContent = '\uD83D\uDCCB Copy Letter';
+                btn.classList.remove('copied');
+              }, 2200);
+            });
+          } else {
+            /* Fallback for older browsers */
+            var ta = document.createElement('textarea');
+            ta.value = letterText;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            ta.remove();
+            btn.textContent = '\u2713 Copied!';
+            btn.classList.add('copied');
+            setTimeout(function () {
+              btn.textContent = '\uD83D\uDCCB Copy Letter';
+              btn.classList.remove('copied');
+            }, 2200);
+          }
+        });
+
+        /* Print button */
+        document.getElementById('btn-print-letter').addEventListener('click', function () {
+          window.print();
+        });
+      }
+
+      /* ── Init ───────────────────────────────────── */
+      setProgress(1);
+    })();
+  </script>
+
+  <!-- ═══ WEBLLLM EDGE CASE HANDLER (ESM module) ═══ -->
+  <script type="module">
+    import * as webllm from 'https://esm.run/@mlc-ai/web-llm';
+
+    const MODEL_ID = 'Phi-4-mini-instruct-q4f16_1-MLC';
+    let _engine = null; // cached so second calls are instant
+
+    async function handleEdgeCase(incomeType, incomeRange, software, selfAssessment) {
+
+      /* ── Show loading spinner inside result-content ── */
+      const resultContent = document.getElementById('result-content');
+      resultContent.innerHTML = `
+        <div class="edge-loading-box">
+          <div class="spinner"></div>
+          <p style="color:#f97316;font-weight:600;">Phi-4 Mini is analysing your situation&hellip;</p>
+          <p style="color:#64748b;font-size:0.85rem;">Running locally on your device. No data sent anywhere.</p>
+        </div>`;
+
+      /* ── Structured prompt ── */
+      const prompt = `You are a UK tax assistant specialising in Making Tax Digital (MTD) for Income Tax.
+
+User profile:
+- Income type: ${incomeType}
+- Income range: ${incomeRange}
+- Software status: ${software}
+- Self Assessment: ${selfAssessment}
+
+Based on HMRC MTD rules (April 2026 onwards):
+- \u00a350k+ threshold: mandatory from April 2026
+- \u00a330k+ threshold: mandatory from April 2027
+- \u00a320k+ threshold: mandatory from April 2028
+- First quarterly deadline: 7 August 2026
+- Grace period: no penalty points in 2026-27 tax year
+
+Respond ONLY in this exact JSON format, nothing else:
+{
+  "applies": true or false,
+  "phase": "short phase description",
+  "deadline": "deadline date or null",
+  "actions": ["action 1", "action 2", "action 3"],
+  "grace_period": "grace period text or null",
+  "confidence": "high or medium or low",
+  "caveat": "one sentence caveat if needed"
+}`;
+
+      try {
+        /* ── Load or reuse cached engine ── */
+        if (!_engine) {
+          resultContent.querySelector('p').textContent = 'Downloading Phi-4 Mini (first run only)\u2026';
+          _engine = await webllm.CreateMLCEngine(MODEL_ID, {
+            initProgressCallback: (p) => {
+              const pct = p.progress ? Math.round(p.progress * 100) : '';
+              const msg = resultContent.querySelector('p');
+              if (msg) msg.textContent = 'Loading model' + (pct ? ': ' + pct + '%' : '\u2026');
+              console.log('[WebLLM]', p);
+            }
+          });
+        }
+
+        /* ── Inference ── */
+        const reply = await _engine.chat.completions.create({
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.1,
+          max_tokens: 350
+        });
+
+        let raw = reply.choices[0].message.content;
+
+        /* Strip markdown code fences if present */
+        raw = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
+
+        const parsed = JSON.parse(raw);
+
+        /* Basic schema validation */
+        if (parsed.applies === undefined || !Array.isArray(parsed.actions)) {
+          throw new Error('Schema validation failed');
+        }
+
+        /* Add an AI caveat flag so the result UI can show it */
+        parsed._ai_generated = true;
+        parsed._caveat = parsed.caveat || null;
+
+        /* Store globally and render */
+        window.currentProfile = parsed;
+        if (typeof window.__taxplainRender === 'function') {
+          window.__taxplainRender(parsed);
+        }
+
+      } catch (err) {
+        console.error('[WebLLM] Edge case failed:', err);
+
+        /* ── Graceful fallback UI ── */
+        resultContent.innerHTML = `
+          <div class="edge-fallback-box">
+            <p style="color:var(--primary);font-size:1.2rem;">&#x26A0;&#xFE0F; Your situation is complex</p>
+            <p style="color:var(--text);margin-top:12px;">
+              Your income profile involves edge cases (partnerships, overseas income,
+              or furnished holiday lets) that require professional advice.
+            </p>
+            <p style="color:var(--text-muted);margin-top:14px;font-size:0.88rem;">
+              We recommend consulting a qualified accountant or visiting
+              <a href="https://www.gov.uk/guidance/check-if-youre-eligible-for-making-tax-digital-for-income-tax"
+                 target="_blank" rel="noopener">HMRC&rsquo;s official MTD guidance &rarr;</a>
+            </p>
+            <button id="edge-restart-btn"
+              style="margin-top:24px;background:transparent;border:1px solid rgba(148,163,184,0.3);
+                     color:var(--text-muted);padding:12px 24px;border-radius:8px;
+                     cursor:pointer;font-family:inherit;font-size:0.95rem;">
+              &larr; Start Over
+            </button>
+          </div>`;
+
+        document.getElementById('edge-restart-btn').addEventListener('click', function () {
+          if (typeof window.__taxplainRestart === 'function') window.__taxplainRestart();
+        });
+      }
+    }
+
+    /* Expose to main (non-module) script via window bridge */
+    window.__taxplainEdgeCase = handleEdgeCase;
+  </script>
+
+  <!-- Hidden print area — populated by openLetterModal(), shown only via @media print -->
+  <div id="letter-print-area" style="display:none;" aria-hidden="true"></div>
+
+  <div id="install-banner" style="display:none; 
+  position:fixed; bottom:20px; left:50%; 
+  transform:translateX(-50%); 
+  background:#1a1a2e; 
+  border:1px solid rgba(249,115,22,0.4); 
+  border-radius:12px; padding:16px 24px; 
+  display:flex; align-items:center; gap:16px;
+  box-shadow: 0 0 30px rgba(249,115,22,0.15);
+  z-index:1000;">
+  <span style="color:#e2e8f0; font-size:0.9rem;">
+    📱 Install TaxPlain on your phone
+  </span>
+  <button id="install-btn" 
+    style="background:#f97316; color:white; 
+    border:none; padding:8px 16px; 
+    border-radius:8px; cursor:pointer; 
+    font-weight:600;">
+    Install
+  </button>
+  <button onclick="
+    document.getElementById('install-banner')
+    .style.display='none'" 
+    style="background:transparent; border:none; 
+    color:#64748b; cursor:pointer; font-size:1.2rem;">
+    ✕
+  </button>
+</div>
+
+<script>
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('install-banner')
+    .style.display = 'flex';
+});
+
+document.getElementById('install-btn')
+  .addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      document.getElementById('install-banner')
+        .style.display = 'none';
+    }
+  });
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(() => console.log('TaxPlain SW registered'))
+      .catch(err => console.log('SW failed:', err));
+  });
+}
+</script>
+
+</body>
+</html>
